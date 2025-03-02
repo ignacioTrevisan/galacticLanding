@@ -2,6 +2,10 @@
 
 # dependencies
 /node_modules
+/public/video2.mp4
+/public/videoFondo.mp4
+/public/frames
+/public/frames2
 /.pnp
 .pnp.*
 .yarn/*
