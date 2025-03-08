@@ -242,7 +242,7 @@ export default function Template() {
     const Lenis = ReactLenis as unknown as React.FC<{ root?: boolean; children: React.ReactNode }>;
 
     return (
-        <Lenis>
+        <Lenis root>
             <Navbar />
             <div className="bodyContainer animate__animated animate__fadeIn" ref={container} id="contenedorSecundario" >
                 <section className="hero">
