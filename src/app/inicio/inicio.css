@@ -1,0 +1,348 @@
+.bodyContainer {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+h1 {
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 2rem;
+}
+
+p {
+    font-weight: 500;
+}
+
+.hero,
+.intro,
+.outro {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    pointer-events: none;
+}
+
+.hero {
+    padding: 0;
+}
+
+.intro,
+.outro {
+    background-color: #000000;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    pointer-events: none;
+}
+
+
+
+.intro h1,
+.outro h1 {
+    margin-bottom: 0;
+}
+
+.card {
+    position: relative;
+    display: flex;
+}
+
+.card-inner {
+    position: relative;
+    will-change: transform;
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    overflow: hidden;
+}
+
+
+
+.card-content {
+    flex: 1;
+}
+
+
+.card-img {
+    transition: flex 0.3s ease-in-out;
+    flex: 1;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    margin-top: 1rem;
+    cursor: pointer;
+}
+
+.card-img-grande {
+    transition: flex 0.3s ease-in-out;
+    flex: 1;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    margin-top: 1rem;
+    cursor: pointer;
+}
+
+
+
+
+/* Estilos específicos para cada tarjeta */
+#card-1 .card-inner {
+    background-color: #0A0A23;
+    color: #FFF;
+}
+
+#card-1 .card-inner h1 {
+    color: #FFF;
+}
+
+#card-1 .card-inner p {
+    color: #C0C0C0;
+}
+
+#card-2 .card-inner {
+    background-color: #1A1A40;
+}
+
+#card-2 .card-inner h1 {
+    color: #FFF;
+}
+
+#card-2 .card-inner p {
+    color: #D8BFD8;
+}
+
+#card-3 .card-inner {
+    background-color: #000000;
+}
+
+#card-3 .card-inner h1 {
+    color: #6A0DAD;
+}
+
+#card-3 .card-inner p {
+    color: #FFFFFF;
+}
+
+#card-4 .card-inner {
+    background-color: #1A1A1A;
+}
+
+#card-4 .card-inner h1 {
+    color: #C0C0C0;
+}
+
+#card-4 .card-inner p {
+    color: #FFFFFF;
+}
+
+/* En dispositivos móviles, mostrar la imagen y el contenido en formato vertical */
+
+
+.outro h1 {
+    animation: appear;
+}
+
+@keyframes appear {
+    from {}
+}
+
+.proyect {
+    width: 100%;
+    max-width: 200px;
+    height: 0;
+    padding-bottom: 100%;
+    background-color: #6A0DAD;
+    position: relative;
+}
+
+.client-cards-container {
+    perspective: 2000px;
+    min-height: 40vh;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 1rem;
+    pointer-events: none;
+}
+
+@media (min-width: 768px) {
+    .client-cards-container {
+        max-width: 2500px;
+        padding: 2rem;
+    }
+}
+
+
+
+/* Estilos base para las tarjetas de clientes */
+.client-card {
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+    border-radius: 12px;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    max-width: 100%;
+    margin-bottom: 1rem;
+    pointer-events: none;
+}
+
+/* Animación de flotar para las partículas */
+@keyframes float {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateY(-100px) translateX(20px);
+        opacity: 0;
+    }
+}
+
+/* Animación de brillo en las estrellas */
+@keyframes twinkle {
+
+    0%,
+    100% {
+        opacity: 0.2;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+.space-star {
+    animation: twinkle 3s infinite ease-in-out;
+}
+
+/* Estilos para el resplandor de las tarjetas */
+.card-glow {
+    position: absolute;
+    inset: -5px;
+    background: radial-gradient(circle at center, rgba(106, 13, 173, 0.5) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    z-index: -1;
+    border-radius: 16px;
+}
+
+.client-card:hover .card-glow {
+    opacity: 1;
+}
+
+/* Hack para webkit para asegurar el correcto funcionamiento de backface-visibility */
+.backface-hidden {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* Ajustes para videos y media en dispositivos móviles */
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Asegurar que las imágenes se carguen correctamente en móviles */
+#imagenOutro {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@media (min-width: 768px) {
+
+    .intro,
+    .outro {
+        pointer-events: none;
+        padding: 2rem;
+    }
+}
+
+@media (hover: none) {
+    .client-card {
+        transform: none !important;
+    }
+
+    .client-card .card-glow {
+        opacity: 0.3;
+    }
+}
+
+@media (max-width: 767px) {
+    .mobile-cards {
+        position: relative;
+        z-index: 10;
+        margin-bottom: 2rem;
+    }
+
+    .mobile-cards .card {
+        position: relative !important;
+        margin-bottom: 2rem;
+        transform: none !important;
+    }
+
+    .mobile-cards .card-inner {
+        transform: none !important;
+    }
+
+    .outro {
+        position: relative !important;
+        z-index: 20;
+        pointer-events: none;
+    }
+}
+
+@media (max-width: 767px) {
+    .card {
+        margin-bottom: 2rem;
+        height: auto;
+        min-height: 80vh;
+    }
+
+    .cards {
+        padding-bottom: 1rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .card-inner {
+        flex-direction: row;
+        padding: 2rem;
+        gap: 4rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .card-content {
+        flex: 3;
+    }
+}
+
+@media (min-width: 768px) {
+    .card-img {
+        margin-top: 0;
+        flex: 1;
+    }
+
+    .card-img-grande {
+        margin-top: 0;
+        flex: 3;
+    }
+}

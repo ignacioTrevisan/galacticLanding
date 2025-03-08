@@ -9,12 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "@studio-freight/react-lenis": "^0.0.47",
     "animate.css": "^4.1.1",
     "aos": "^2.3.4",
     "framer-motion": "^12.4.7",
+    "gsap": "^3.12.7",
     "next": "15.2.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "next-view-transitions": "^0.3.4",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "split-type": "^0.3.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

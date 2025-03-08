@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import '../../public/fonts/Orbitron.css'
+import { ViewTransitions } from "next-view-transitions";
 
 
 export const metadata: Metadata = {
@@ -15,15 +15,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`antialiased`}
-      >
-        <main>
+    <ViewTransitions>
+      <html lang="en">
 
-          {children}
-        </main>
-      </body>
-    </html>
+        <body
+          className={`antialiased`}
+        >
+          <main>
+
+            {children}
+          </main>
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

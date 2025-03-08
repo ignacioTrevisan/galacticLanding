@@ -6,7 +6,7 @@
 }
 
 :root {
-  --background: #ffffff;
+  --background: #000000;
   --foreground: #171717;
 }
 
@@ -31,9 +31,9 @@ body {
   height: auto;
 }
 
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
   width: 0;
-}
+} */
 
 /* 
 h1 {

@@ -4,6 +4,8 @@ video {
     width: 100vw;
     object-fit: cover;
     position: fixed;
+    top: 0;
+    left: 0;
 }
 
 .containerInicial {
@@ -24,6 +26,15 @@ video {
     scrollbar-width: 0;
     height: 300vh;
     width: 100vw;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.contenedorPadre::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
 }
 
 #scrollPath {
@@ -31,10 +42,9 @@ video {
     position: fixed;
     top: 0;
     right: 0;
-    width: 10px;
-
+    width: 6px;
+    height: 100%;
     background-color: rgba(255, 255, 255, 0.1);
-    /* Ligeramente visible */
 }
 
 #progressBar {
@@ -42,11 +52,11 @@ video {
     position: fixed;
     top: 0;
     right: 0;
-    width: 10px;
-    height: 100%;
+    width: 6px;
+    height: 0;
     background: linear-gradient(to top, #100720, #2E1A47);
     animation: animate 5s linear infinite;
-    opacity: .3;
+    opacity: .5;
 }
 
 @keyframes animate {
@@ -70,7 +80,6 @@ video {
     height: 100%;
     background: linear-gradient(to top, #100720, #070869);
     filter: blur(10px);
-
 }
 
 #progressBar:after {
@@ -82,17 +91,14 @@ video {
     height: 100%;
     background: linear-gradient(to top, #100720, #2E1A47, #6A0DAD);
     filter: blur(30px);
-
 }
 
 .segundaAnimacionEstadoInicial {
     opacity: 0;
-    font-size: 48px;
 }
 
 .segundaAnimacionEstadoFinal {
     opacity: 1;
-    font-size: 48px;
 }
 
 .finalDePrimerosTitulos {
@@ -102,16 +108,13 @@ video {
 
 .glitch {
     animation: glitchEfecto .1s ease-in-out 2 1s;
-    /* 2 repeticiones, cada una dura 2.5s */
 }
 
 @keyframes glitchEfecto {
-
     0% {
         opacity: 1;
         z-index: 50;
     }
-
 
     20% {
         opacity: 0;
@@ -132,5 +135,27 @@ video {
     100% {
         opacity: 1;
         z-index: 0;
+    }
+}
+
+/* Media queries para dispositivos móviles */
+@media (max-width: 768px) {
+
+    #scrollPath,
+    #progressBar {
+        width: 4px;
+    }
+
+    #progressBar:before,
+    #progressBar:after {
+        filter: blur(5px);
+    }
+}
+
+@media (max-width: 480px) {
+
+    #primerTitulo,
+    #segundoTitulo {
+        padding: 0 1rem;
     }
 }

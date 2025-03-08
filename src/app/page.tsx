@@ -1,12 +1,11 @@
 "use client"
-import Image from "next/image";
 import 'animate.css';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import './primerSeccion.css'
-import ContenedorSecundario from "./contenedorSecundario";
+
 export default function Home() {
   const [id, setId] = useState('1');
-  const [visible, setVisible] = useState(true)
+  const [visible, setVisible] = useState(true);
   const maxFrames = 100;
 
   useEffect(() => {
@@ -16,27 +15,23 @@ export default function Home() {
     const segundoTexto = document.getElementById('segundoTitulo') as HTMLDivElement;
     const textoParaGlitch = document.getElementById('efectoGlitch') as HTMLDivElement;
     const progress = document.getElementById('progressBar') as HTMLDivElement;
+
     const handleScroll = () => {
       if (!contenedor || !imagen) return;
 
-      const maxScroll = contenedor.scrollHeight - window.innerHeight;
-      const mitadDeScroll = contenedor.scrollHeight / 2;
-      console.log({ hoa: contenedor.scrollHeight })
+      const mitadDeScroll = contenedor.scrollHeight;
       const posicionActualDeScroll = window.scrollY;
       const fraccionDeScroll = posicionActualDeScroll / mitadDeScroll;
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progressHeight = (posicionActualDeScroll / scrollHeight) * 100;
+
       progress.style.height = `${posicionActualDeScroll}px`;
-      let frame = Math.floor(fraccionDeScroll * maxFrames) || 1;
 
+      const frame = Math.floor(fraccionDeScroll * maxFrames) || 1;
       setId(frame.toString());
-
       const idStr = frame.toString().padStart(3, '0');
       imagen.src = `/frames2/ezgif-frame-${idStr}.jpg`;
 
-      // Interpolación para la escala: de 0.7 a 1
+      // Interpolación para la escala: de 0.9 a 1.2
       const scale = 0.9 + ((frame - 1) / (maxFrames - 1)) * 0.3;
-      // Aplico la escala al elemento que desees; en este ejemplo a primerTexto
       primerTexto.style.transform = `scale(${scale})`;
 
       if (frame > 90) {
@@ -48,7 +43,6 @@ export default function Home() {
             textoParaGlitch.classList.add('glitch');
           } else {
             textoParaGlitch.classList.remove('glitch');
-
           }
           segundoTexto.style.opacity = ((ultimoDigito * 10) / 100).toString();
           const opacidad = (100 - (ultimoDigito * 10)) / 100;
@@ -64,59 +58,47 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-
-
-
-
   return (
-    <div className="contenedorPadre bg-black w-full h-full " id="contenedorPadre">
-
+    <div className="contenedorPadre bg-black w-full h-full" id="contenedorPadre">
       <div className={`w-full contenedorIniciar bg-black ${visible ? 'block' : 'hidden'}`} id="contenedorIniciar">
-
         <div id='scrollPath' />
         <div id='progressBar' />
-
-        <div className="flex flex-col justify-end w-full relative h-screen bg-black text-white text-5xl overflow-hidden">
-          <div className="fixed top-0 w-full min-h-screen bg-black z-1 "
+        <div className="flex flex-col justify-end w-full relative h-screen bg-black text-white overflow-hidden">
+          <div className="fixed top-0 w-full min-h-screen bg-black z-1"
             style={{ opacity: `${+id * 1.5}%` }}
           ></div>
-          {/* <video src="/videoFondo.mp4" id="video" className="top-0 z-0" muted></video> */}
-          <img src={`/frames2/ezgif-frame-001.jpg`} id="imagen" />
-          <div className={` mt-10 w-full fixed h-screen  flex-row justify-center pb-5 gap-y-3 items-center  z-10
-        
-        overflow-hidden flex  }
-        `} id="primerTitulo"
+          <img src={`/frames2/ezgif-frame-001.jpg`} id="imagen" className="object-cover" />
+
+          {/* Primer título con diseño responsivo */}
+          <div className="mt-10 w-full fixed h-screen flex flex-col justify-center items-center z-10 px-4 md:px-8 overflow-hidden"
+            id="primerTitulo"
             style={{ opacity: 0 }}>
-            <div className="absolute ">
-              <h1 className="text-[48px]">Tu negocio merece una web de otro planeta</h1>
-              <h2 className="text-[24px] text-center">Creamos experiencias digitales que llevan tu marca a nuevas galaxias
-              </h2>
+            <div className="text-center max-w-4xl mx-auto">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">Tu negocio merece una web de otro planeta</h1>
+              <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl mt-4">Creamos experiencias digitales que llevan tu marca a nuevas galaxias</h2>
             </div>
           </div>
-          <div className={` mt-10 w-full fixed h-screen  flex-row justify-center pb-5 gap-y-3 items-center  z-10
-        
-        overflow-hidden flex }
-        `}
+
+          {/* Segundo título con diseño responsivo */}
+          <div className="mt-10 w-full fixed h-screen flex flex-col justify-center items-center z-10 px-4 md:px-8 overflow-hidden"
             style={{ opacity: 0 }}
-            id="segundoTitulo"
-          >
-
-
-
-            <img src="/glitch.png" alt="" className=" relative z-10 opacity-0  w-1 self-end " id="efectoGlitch" width={5} height={5} />
-            <div className="absolute flex flex-col justify-center" >
-              <h1 className="text-[72px] ">Galactic</h1>
-              <h3 className="text-center text-[#adadad] text-[32px]">{`<Code />`}
-              </h3>
+            id="segundoTitulo">
+            <img src="/glitch.png" alt="" className="relative z-10 opacity-0 w-1 self-end" id="efectoGlitch" width={5} height={5} />
+            <div className="text-center">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold">Galactic</h1>
+              <h3 className="text-center text-[#adadad] text-xl sm:text-2xl md:text-3xl">{`<Code />`}</h3>
             </div>
-            <button className="text-white self-end cursor-pointer z-40" onClick={() => setVisible(false)}>Comienza tu viaje</button>
+            <div className="mt-8 sm:mt-12 z-50">
+              <button
+                className="text-white py-2 px-4 border-0  hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer z-40"
+                onClick={() => { setVisible(false); window.location.replace('/inicio') }}>
+                Comienza tu viaje
+              </button>
+            </div>
           </div>
-
-        </div >
+        </div>
       </div>
-
-      {!visible && <ContenedorSecundario />
-      }
+      {/* {!visible && <ContenedorSecundario />} */}
     </div>
   );
 }
