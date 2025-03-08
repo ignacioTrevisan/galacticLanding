@@ -44,14 +44,46 @@ const Card = ({ title, copy, index }: CardProps) => {
 export default function Template() {
     const container = useRef<HTMLDivElement>(null);
     const [isMobile, setIsMobile] = useState(false);
+    const [showScrollMessage, setShowScrollMessage] = useState(false);
+    const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+    const [isMessageShowed, setisMessageShowed] = useState(false)
+    // Manejo del mensaje de scroll
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowScrollMessage(false);
+            if (scrollTimeout.current) {
+                clearTimeout(scrollTimeout.current);
+            }
+
+            scrollTimeout.current = setTimeout(() => {
+                if (isMessageShowed === true) return;
+                setisMessageShowed(true)
+                setShowScrollMessage(true);
+            }, 15000); // 2 segundos
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        // Iniciar el timeout cuando se carga la página
+        scrollTimeout.current = setTimeout(() => {
+            if (isMessageShowed === true) return;
+            setisMessageShowed(true)
+            setShowScrollMessage(true);
+        }, 5000);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            if (scrollTimeout.current) {
+                clearTimeout(scrollTimeout.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         const checkScreenSize = () => {
             setIsMobile(window.innerWidth < 768);
         };
-        // Comprobar al cargar
         checkScreenSize();
-        // Comprobar cuando cambia el tamaño de la ventana
         window.addEventListener('resize', checkScreenSize);
         return () => {
             window.removeEventListener('resize', checkScreenSize);
@@ -59,10 +91,8 @@ export default function Template() {
     }, []);
 
     useGSAP(() => {
-        // Clear any existing ScrollTriggers to prevent conflicts on re-renders
         ScrollTrigger.getAll().forEach(st => st.kill());
         if (isMobile) {
-            // Para móvil, limpiamos cualquier estilo residual de ScrollTrigger
             const cards = gsap.utils.toArray<HTMLDivElement>(".card");
             cards.forEach((card) => {
                 gsap.set(card, { clearProps: "all" });
@@ -76,7 +106,6 @@ export default function Template() {
 
         const cards = gsap.utils.toArray<HTMLDivElement>(".card");
 
-        // Pin the intro section
         ScrollTrigger.create({
             trigger: cards[0],
             start: "top 35%",
@@ -90,7 +119,6 @@ export default function Template() {
             const isLastCard = index === cards.length - 1;
             const cardInner = card.querySelector(".card-inner");
 
-            // Skip the last card for pinning but still animate its inner content
             if (!isLastCard) {
                 ScrollTrigger.create({
                     trigger: card,
@@ -102,7 +130,6 @@ export default function Template() {
                 });
             }
 
-            // Apply the vertical offset animation to all cards including the last one
             gsap.to(cardInner, {
                 y: `-${(cards.length - index) * 14}vh`,
                 ease: "none",
@@ -146,9 +173,7 @@ export default function Template() {
 
             if (!contenedor || !video || !imagen) return;
 
-
             if (isMobile) {
-                // Asegurarnos de que las cards no interfieran con el outro en móvil
                 const cardsElements = document.querySelectorAll('.card');
                 cardsElements.forEach(card => {
                     (card as HTMLElement).style.transform = 'none';
@@ -167,25 +192,20 @@ export default function Template() {
 
             video.style.opacity = `${opacidad.toString().split(".")[0]}%`;
 
-            // Verificar si las cards terminaron
             const cardsSection = document.querySelector('.cards') as HTMLElement;
             const cardsSectionBottom = cardsSection ? cardsSection.getBoundingClientRect().bottom : 0;
 
-            // Ajustar los puntos de inicio según el tamaño de la pantalla
-            const factorMultiplicador = isMobile ? 1.5 : 5; // Reducido para móvil
-            const factorOpacidad = isMobile ? 1 : 4; // Reducido para móvil
+            const factorMultiplicador = isMobile ? 1.5 : 5;
+            const factorOpacidad = isMobile ? 1 : 4;
 
-            // Punto de inicio para los frames - en móvil usar la posición de las cards
             const puntoInicioFrames = isMobile
                 ? posicionActualDeScroll + cardsSectionBottom - (window.innerHeight / 2)
                 : contenedor.scrollHeight - (window.innerHeight * factorMultiplicador);
 
-            // Punto de inicio para la opacidad - en móvil mostrar justo después de las cards
             const puntoInicioOpacidad = isMobile
                 ? posicionActualDeScroll + cardsSectionBottom - window.innerHeight
                 : contenedor.scrollHeight - (window.innerHeight * factorOpacidad);
 
-            // Cambiar frames desde el punto de inicio
             if (posicionActualDeScroll > puntoInicioFrames) {
                 const distanciaRecorrida = posicionActualDeScroll - puntoInicioFrames;
                 const totalDistancia = isMobile ? window.innerHeight * 1.5 : window.innerHeight * factorMultiplicador;
@@ -195,7 +215,6 @@ export default function Template() {
                 imagen.src = `/asteroidesFrames/ezgif-frame-${idStr}.jpg`;
             }
 
-            // Control de opacidad
             if (posicionActualDeScroll <= puntoInicioOpacidad) {
                 imagen.style.opacity = "0";
                 setOutroVisible(false);
@@ -244,7 +263,7 @@ export default function Template() {
     return (
         <Lenis root>
             <Navbar />
-            <div className="bodyContainer animate__animated animate__fadeIn" ref={container} id="contenedorSecundario" >
+            <div className="bodyContainer animate__animated animate__fadeIn" ref={container} id="contenedorSecundario">
                 <section className="hero">
                     <video
                         src="https://res.cloudinary.com/nachotrevisan/video/upload/v1741385181/Video2_qwjjty.mp4"
@@ -262,21 +281,15 @@ export default function Template() {
                     </h1>
                 </section>
 
-                {/* Add a specific class for mobile styling */}
-                <section className={`cards relative z-50 ${isMobile ? 'mobile-cards' : ''}`} id='servicios'
-
-                >
+                <section className={`cards relative z-50 ${isMobile ? 'mobile-cards' : ''}`} id='servicios'>
                     {cards.map((c, index) => (
                         <Card {...c} index={index} key={index} />
                     ))}
                 </section>
 
-
                 <section className={`outro text-[#6A0DAD] px-4 transition-all w-full pointer-events-none`} id='clientes'
-
                     style={{ opacity: outroVisible ? 1 : 0, pointerEvents: 'fill' }}>
-                    <div id="outroContainer" className="relative"
-                    >
+                    <div id="outroContainer" className="relative">
                         <div
                             className="z-10 sticky top-10 text-white transition-opacity duration-5000 mb-6 md:mb-12"
                             style={{ opacity: outroVisible ? 1 : 0 }}
@@ -284,16 +297,12 @@ export default function Template() {
                             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">Nuestros clientes</h1>
                         </div>
                         <div
-                            className={`client-cards-container sticky top-40 z-20 transition-opacity duration-5000 w-full mx-auto `}
+                            className={`client-cards-container sticky top-40 z-20 transition-opacity duration-5000 w-full mx-auto`}
                             style={{ opacity: outroVisible ? 1 : 0 }}
                             id="clientsContainer"
-
                         >
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8" >
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                                 {clients.map((client) => (
-
-
-
                                     <ClientCard
                                         key={client.id}
                                         client={client}
@@ -301,8 +310,6 @@ export default function Template() {
                                         containerId="clientsContainer"
                                         className="animate__animated animate__fadeIn animate__slower"
                                     />
-
-
                                 ))}
                             </div>
                         </div>
@@ -314,6 +321,15 @@ export default function Template() {
                         />
                     </div>
                 </section>
+
+                {/* Mensaje de scroll */}
+                {showScrollMessage && (
+                    <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 animate__animated animate__fadeIn">
+                        <div className="bg-white/90 text-black px-4 py-2 rounded-full shadow-lg">
+                            <p className="text-sm md:text-base">Scrolee hacia abajo</p>
+                        </div>
+                    </div>
+                )}
             </div>
         </Lenis>
     );

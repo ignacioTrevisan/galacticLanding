@@ -1,12 +1,42 @@
 "use client"
 import 'animate.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './primerSeccion.css'
 
 export default function Home() {
   const [id, setId] = useState('1');
   const [visible, setVisible] = useState(true);
+  const [showScrollMessage, setShowScrollMessage] = useState(false);
   const maxFrames = 100;
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // Manejo del mensaje de scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollMessage(false);
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+
+      scrollTimeout.current = setTimeout(() => {
+        setShowScrollMessage(true);
+      }, 15000); // 2 segundos
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    // Iniciar el timeout cuando se carga la página
+    scrollTimeout.current = setTimeout(() => {
+      setShowScrollMessage(true);
+    }, 2000);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const contenedor = document.getElementById('contenedorIniciar');
@@ -73,8 +103,8 @@ export default function Home() {
           <div className="mt-10 w-full fixed h-screen flex flex-col justify-center items-center z-10 px-4 md:px-8 overflow-hidden"
             id="primerTitulo"
             style={{ opacity: 0 }}>
-            <div className="text-center max-w-4xl mx-auto">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">Tu negocio merece una web de otro planeta</h1>
+            <div className="text-center w-full mx-auto">
+              <h1 className="text-[48px] sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">Tu negocio merece una web de otro planeta</h1>
               <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl mt-4">Creamos experiencias digitales que llevan tu marca a nuevas galaxias</h2>
             </div>
           </div>
@@ -96,6 +126,15 @@ export default function Home() {
               </button>
             </div>
           </div>
+
+          {/* Mensaje de scroll */}
+          {showScrollMessage && (
+            <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 animate__animated animate__fadeIn">
+              <div className="bg-white/90 text-black px-4 py-2 rounded-full shadow-lg">
+                <p className="text-sm md:text-base">Scrolee hacia abajo</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       {/* {!visible && <ContenedorSecundario />} */}

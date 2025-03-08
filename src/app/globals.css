@@ -31,9 +31,9 @@ body {
   height: auto;
 }
 
-/* ::-webkit-scrollbar {
+::-webkit-scrollbar {
   width: 0;
-} */
+}
 
 /* 
 h1 {

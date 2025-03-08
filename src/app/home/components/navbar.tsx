@@ -50,7 +50,7 @@ export const Navbar = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             setNavVisible(true);
-        }, 4000);
+        }, 2000);
 
         return () => clearTimeout(timer);
     }, []);
