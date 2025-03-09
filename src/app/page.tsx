@@ -37,7 +37,7 @@ export default function Home() {
       }
     };
   }, []);
-
+  const [yaestaabajo, setYaestaabajo] = useState(false)
   useEffect(() => {
     const contenedor = document.getElementById('contenedorIniciar');
     const imagen = document.getElementById('imagen') as HTMLImageElement;
@@ -67,9 +67,11 @@ export default function Home() {
       if (frame > 90) {
         if (frame > 99) {
           primerTexto.style.opacity = '0';
+          setYaestaabajo(true)
         } else {
           const ultimoDigito = +frame.toString().slice(-1);
           if (frame > 95) {
+            setYaestaabajo(true)
             textoParaGlitch.classList.add('glitch');
           } else {
             textoParaGlitch.classList.remove('glitch');
@@ -114,12 +116,12 @@ export default function Home() {
           <div className="mt-10 w-full fixed h-screen flex flex-col justify-center items-center z-10 px-4 md:px-8 overflow-hidden"
             style={{ opacity: 0 }}
             id="segundoTitulo">
-            <img src="/glitch.png" alt="" className="relative z-10 opacity-0 w-1 self-end" id="efectoGlitch" width={5} height={5} />
+            <img src="/glitch.png" alt="" className="relative z-50 opacity-0 w-1 self-end" id="efectoGlitch" width={5} height={5} />
             <div className="text-center">
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold">Galactic</h1>
               <h3 className="text-center text-[#adadad] text-xl sm:text-2xl md:text-3xl">{`<Code />`}</h3>
             </div>
-            <div className="mt-8 sm:mt-12 z-50">
+            <div className="mt-8 sm:mt-12 z-40">
               <button
                 className="text-white bg-black bg-opacity-50 py-3 px-6 rounded-full border border-blue-400 shadow-lg shadow-blue-500/50 hover:bg-indigo-900 hover:text-blue-200 hover:border-blue-300 hover:shadow-blue-400/70 transition-all duration-300 cursor-pointer z-40 font-medium tracking-wider relative"
                 onClick={() => { setVisible(false); window.location.replace('/inicio') }}
@@ -162,7 +164,7 @@ export default function Home() {
           </div>
 
           {/* Mensaje de scroll */}
-          {showScrollMessage && (
+          {(showScrollMessage && !yaestaabajo) && (
             <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 animate__animated animate__fadeIn">
               <div className="bg-white/90 text-black px-4 py-2 rounded-full shadow-lg">
                 <p className="text-sm md:text-base">Scrolee hacia abajo</p>
