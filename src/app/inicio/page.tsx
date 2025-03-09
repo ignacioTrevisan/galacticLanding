@@ -170,6 +170,7 @@ export default function Template() {
             const contenedor = document.getElementById("contenedorSecundario") as HTMLDivElement;
             const video = document.getElementById("video") as HTMLVideoElement;
             const imagen = document.getElementById("imagenOutro") as HTMLImageElement;
+            const continuara = document.getElementById('titulo') as HTMLTitleElement;
 
             if (!contenedor || !video || !imagen) return;
 
@@ -211,8 +212,33 @@ export default function Template() {
                 const totalDistancia = isMobile ? window.innerHeight * 1.5 : window.innerHeight * factorMultiplicador;
                 const progreso = distanciaRecorrida / totalDistancia;
                 const frame = Math.min(140, Math.max(1, Math.floor(progreso * 139) + 1));
+
                 const idStr = frame.toString().padStart(3, "0");
                 imagen.src = `/asteroidesFrames/ezgif-frame-${idStr}.jpg`;
+
+                // Calcular la opacidad de la imagen basada en el frame
+                // Comenzamos el desvanecimiento en el frame 70 y terminamos en el frame 120
+                const fadeStartFrame = 70;
+                const fadeEndFrame = 120;
+
+                if (frame >= fadeStartFrame) {
+                    // Calcular la opacidad basada en el progreso de frame
+                    const fadeProgress = (frame - fadeStartFrame) / (fadeEndFrame - fadeStartFrame);
+                    // Limitar el progreso entre 0 y 1
+                    const clampedProgress = Math.min(1, Math.max(0, fadeProgress));
+                    // Calcular la opacidad (de 1 a 0)
+                    const imageOpacity = 1 - clampedProgress;
+
+                    // Aplicar la opacidad a la imagen
+                    imagen.style.opacity = imageOpacity.toString();
+
+                    // Asegurarse de que el texto siempre está visible
+                    continuara.style.opacity = '1';
+                } else {
+                    // Antes del inicio del desvanecimiento, tanto la imagen como el texto están completamente visibles
+                    imagen.style.opacity = '1';
+                    continuara.style.opacity = '1';
+                }
             }
 
             if (posicionActualDeScroll <= puntoInicioOpacidad) {
@@ -220,7 +246,7 @@ export default function Template() {
                 setOutroVisible(false);
             } else {
                 setOutroVisible(true);
-                imagen.style.opacity = "1";
+                // No establecer la opacidad aquí ya que se maneja en la lógica anterior
             }
         };
 
@@ -263,6 +289,7 @@ export default function Template() {
     return (
         <Lenis root>
             <Navbar />
+
             <div className="bodyContainer animate__animated animate__fadeIn" ref={container} id="contenedorSecundario">
                 <section className="hero">
                     <video
@@ -294,14 +321,15 @@ export default function Template() {
                             className="z-10 sticky top-10 text-white transition-opacity duration-5000 mb-6 md:mb-12"
                             style={{ opacity: outroVisible ? 1 : 0 }}
                         >
-                            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">Nuestros clientes</h1>
+                            {/* <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">Nuestros clientes</h1> */}
                         </div>
                         <div
                             className={`client-cards-container sticky top-40 z-20 transition-opacity duration-5000 w-full mx-auto`}
                             style={{ opacity: outroVisible ? 1 : 0 }}
                             id="clientsContainer"
                         >
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                            <h1 className="text-6xl text-white text-center transition-all duration-4000" id='titulo'>Continuara...</h1>
+                            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                                 {clients.map((client) => (
                                     <ClientCard
                                         key={client.id}
@@ -311,13 +339,14 @@ export default function Template() {
                                         className="animate__animated animate__fadeIn animate__slower"
                                     />
                                 ))}
-                            </div>
+                            </div> */}
                         </div>
                         <img
                             src="/asteroidesFrames/ezgif-frame-001.jpg"
                             alt=""
                             className={`top-0 w-full h-full object-cover ${!outroVisible ? 'hidden' : 'fixed'}`}
                             id='imagenOutro'
+                            style={{ transition: "opacity 0.3s ease" }}
                         />
                     </div>
                 </section>
