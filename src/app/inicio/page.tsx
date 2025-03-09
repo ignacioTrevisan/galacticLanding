@@ -6,7 +6,6 @@ import { useEffect, useRef, useState } from "react";
 import { Navbar } from "../home/components/navbar";
 import "./inicio.css";
 import '../components/outro.css'
-import ClientCard from "@/components/clientCard";
 import 'animate.css';
 import { ReactLenis } from '@studio-freight/react-lenis';
 gsap.registerPlugin(useGSAP, ScrollTrigger);
@@ -254,36 +253,36 @@ export default function Template() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, [isMobile]);
 
-    const clients = [
-        {
-            id: 1,
-            name: "ViaCertatur",
-            image: "/clients/1.jpg",
-            description: "Lading page personalizable para negocio organizador de viajes",
-            url: 'https://www.viacertatur.com/'
-        },
-        {
-            id: 2,
-            name: "Teslo Shop",
-            image: "/clients/2.png",
-            description: "E-comerce con funcionalidades completas integrado con paypal.",
-            url: 'https://tesloshoptrev.vercel.app/'
-        },
-        {
-            id: 3,
-            name: "Cine Click",
-            image: "/clients/3.png",
-            description: "Gestor de cartelera con compras en landing incluida",
-            url: 'https://cine-click-zeta.vercel.app/'
-        },
-        {
-            id: 4,
-            name: "Share your spot",
-            image: "/clients/4.png",
-            description: "Localizador en tiempo real y reproductor de ubicacion",
-            url: '#'
-        }
-    ];
+    // const clients = [
+    //     {
+    //         id: 1,
+    //         name: "ViaCertatur",
+    //         image: "/clients/1.jpg",
+    //         description: "Lading page personalizable para negocio organizador de viajes",
+    //         url: 'https://www.viacertatur.com/'
+    //     },
+    //     {
+    //         id: 2,
+    //         name: "Teslo Shop",
+    //         image: "/clients/2.png",
+    //         description: "E-comerce con funcionalidades completas integrado con paypal.",
+    //         url: 'https://tesloshoptrev.vercel.app/'
+    //     },
+    //     {
+    //         id: 3,
+    //         name: "Cine Click",
+    //         image: "/clients/3.png",
+    //         description: "Gestor de cartelera con compras en landing incluida",
+    //         url: 'https://cine-click-zeta.vercel.app/'
+    //     },
+    //     {
+    //         id: 4,
+    //         name: "Share your spot",
+    //         image: "/clients/4.png",
+    //         description: "Localizador en tiempo real y reproductor de ubicacion",
+    //         url: '#'
+    //     }
+    // ];
     const Lenis = ReactLenis as unknown as React.FC<{ root?: boolean; children: React.ReactNode }>;
 
     return (
