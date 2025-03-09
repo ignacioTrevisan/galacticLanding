@@ -87,6 +87,7 @@ export default function Home() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div className="contenedorPadre bg-black w-full h-full" id="contenedorPadre">
@@ -120,9 +121,42 @@ export default function Home() {
             </div>
             <div className="mt-8 sm:mt-12 z-50">
               <button
-                className="text-white py-2 px-4 border-0  hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer z-40"
-                onClick={() => { setVisible(false); window.location.replace('/inicio') }}>
-                Comienza tu viaje
+                className="text-white bg-black bg-opacity-50 py-3 px-6 rounded-full border border-blue-400 shadow-lg shadow-blue-500/50 hover:bg-indigo-900 hover:text-blue-200 hover:border-blue-300 hover:shadow-blue-400/70 transition-all duration-300 cursor-pointer z-40 font-medium tracking-wider relative"
+                onClick={() => { setVisible(false); window.location.replace('/inicio') }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                {/* Versión estática del texto */}
+                <div
+                  className="transition-opacity duration-300"
+                  style={{ opacity: isHovered ? 0 : 1 }}
+                >
+                  Comienza tu viaje
+                </div>
+
+                {/* Versión animada con la flecha */}
+                <div
+                  className="absolute inset-0 flex items-center justify-center px-3"
+                  style={{ opacity: isHovered ? 1 : 0 }}
+                >
+                  <span
+                    className="relative whitespace-nowrap transition-all duration-1000"
+                    style={{
+                      clipPath: isHovered ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)'
+                    }}
+                  >
+                    Comienza tu viaje
+                  </span>
+                  <span
+                    className=" absolute text-blue-300 transition-transform duration-1000"
+                    style={{
+                      transform: isHovered ? 'translateX(1100%)' : 'translateX(-100%)'
+                    }}
+                  >
+                    &#10095;
+                  </span>
+
+                </div>
               </button>
             </div>
           </div>

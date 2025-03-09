@@ -8,6 +8,7 @@ import "./inicio.css";
 import '../components/outro.css'
 import 'animate.css';
 import { ReactLenis } from '@studio-freight/react-lenis';
+// import ClientCard from "@/components/clientCard";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 interface CardProps {
