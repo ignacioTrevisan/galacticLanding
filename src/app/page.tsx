@@ -121,7 +121,7 @@ export default function Home() {
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold">Galactic</h1>
               <h3 className="text-center text-[#adadad] text-xl sm:text-2xl md:text-3xl">{`<Code />`}</h3>
             </div>
-            <div className="mt-8 sm:mt-12 z-40">
+            <div className="mt-8 sm:mt-12 z-50">
               <button
                 className="text-white bg-black bg-opacity-50 py-3 px-6 rounded-full border border-blue-400 shadow-lg shadow-blue-500/50 hover:bg-indigo-900 hover:text-blue-200 hover:border-blue-300 hover:shadow-blue-400/70 transition-all duration-300 cursor-pointer z-40 font-medium tracking-wider relative"
                 onClick={() => { setVisible(false); window.location.replace('/inicio') }}
