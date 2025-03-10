@@ -328,7 +328,7 @@ export default function Template() {
                             style={{ opacity: outroVisible ? 1 : 0 }}
                             id="clientsContainer"
                         >
-                            <h1 className="text-6xl text-white text-center transition-all duration-4000" id='titulo'>Continuara...</h1>
+                            <h1 className="text-4xl sm:text-6xl text-white text-center transition-all duration-4000" id='titulo'>Continuara...</h1>
                             {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                                 {clients.map((client) => (
                                     <ClientCard
