@@ -171,7 +171,7 @@ export default function Template() {
         for (let i = 1; i <= 140; i++) {
             const idStr = i.toString().padStart(3, "0");
             const img = new Image();
-            img.src = `/asteroidesFrames/ezgif-frame-${idStr}.jpg`;
+            img.src = `/asteroidesFramesWebP/ezgif-frame-${idStr}.webp`;
             imageCache[idStr] = img;
         }
     }
@@ -231,7 +231,7 @@ export default function Template() {
                 const frame = Math.min(140, Math.max(1, Math.floor(progreso * 139) + 1));
 
                 const idStr = frame.toString().padStart(3, "0");
-                imagen.src = imageCache[idStr]?.src || `/asteroidesFrames/ezgif-frame-${idStr}.jpg`;
+                imagen.src = imageCache[idStr]?.src || `/asteroidesFramesWebP/ezgif-frame-${idStr}.webp`;
 
                 // Calcular la opacidad de la imagen basada en el frame
                 // Comenzamos el desvanecimiento en el frame 70 y terminamos en el frame 120
@@ -359,7 +359,7 @@ export default function Template() {
                             </div> */}
                         </div>
                         <img
-                            src="/asteroidesFrames/ezgif-frame-001.jpg"
+                            src="/asteroidesFrames/ezgif-frame-001.webp"
                             alt=""
                             className={`top-0 w-full h-full object-cover ${!outroVisible ? 'hidden' : 'fixed'}`}
                             id='imagenOutro'

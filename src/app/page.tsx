@@ -44,7 +44,7 @@ export default function Home() {
     for (let i = 1; i <= 140; i++) {
       const idStr = i.toString().padStart(3, "0");
       const img = new Image();
-      img.src = `/frames2/ezgif-frame-${idStr}.jpg`;
+      img.src = `/frames2WebP/ezgif-frame-${idStr}.webp`;
       imageCache[idStr] = img;
     }
   }
@@ -75,7 +75,7 @@ export default function Home() {
       const frame = Math.floor(fraccionDeScroll * maxFrames) || 1;
       setId(frame.toString());
       const idStr = frame.toString().padStart(3, '0');
-      imagen.src = imageCache[idStr]?.src || `/frames2/ezgif-frame-${idStr}.jpg`;
+      imagen.src = imageCache[idStr]?.src || `/frames2WebP/ezgif-frame-${idStr}.webp`;
 
       // Interpolación para la escala: de 0.9 a 1.2
       const scale = 0.9 + ((frame - 1) / (maxFrames - 1)) * 0.3;
@@ -117,7 +117,7 @@ export default function Home() {
           <div className="fixed top-0 w-full min-h-screen bg-black z-1"
             style={{ opacity: `${+id * 1.5}%` }}
           ></div>
-          <img src={`/frames2/ezgif-frame-001.jpg`} id="imagen" className="object-cover" />
+          <img src={`/frames2WebP/ezgif-frame-001.webp`} id="imagen" className="object-cover" />
 
           {/* Primer título con diseño responsivo */}
           <div className="mt-10 w-full fixed h-screen flex flex-col justify-center items-center z-10 px-4 md:px-8 overflow-hidden"
