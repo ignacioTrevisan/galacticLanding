@@ -38,6 +38,23 @@ export default function Home() {
     };
   }, []);
   const [yaestaabajo, setYaestaabajo] = useState(false)
+
+  const imageCache = {};
+  function preloadImages() {
+    for (let i = 1; i <= 140; i++) {
+      const idStr = i.toString().padStart(3, "0");
+      const img = new Image();
+      img.src = `/frames2/ezgif-frame-${idStr}.jpg`;
+      imageCache[idStr] = img;
+    }
+  }
+  useEffect(() => {
+
+
+    // Llamar a la función de precarga al inicio
+    preloadImages();
+  }, [])
+
   useEffect(() => {
     const contenedor = document.getElementById('contenedorIniciar');
     const imagen = document.getElementById('imagen') as HTMLImageElement;
@@ -58,7 +75,7 @@ export default function Home() {
       const frame = Math.floor(fraccionDeScroll * maxFrames) || 1;
       setId(frame.toString());
       const idStr = frame.toString().padStart(3, '0');
-      imagen.src = `/frames2/ezgif-frame-${idStr}.jpg`;
+      imagen.src = imageCache[idStr]?.src || `/frames2/ezgif-frame-${idStr}.jpg`;
 
       // Interpolación para la escala: de 0.9 a 1.2
       const scale = 0.9 + ((frame - 1) / (maxFrames - 1)) * 0.3;
