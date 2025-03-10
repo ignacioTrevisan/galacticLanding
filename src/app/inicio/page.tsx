@@ -175,9 +175,12 @@ export default function Template() {
             imageCache[idStr] = img;
         }
     }
+    useEffect(() => {
 
-    // Llamar a la función de precarga al inicio
-    preloadImages();
+
+        // Llamar a la función de precarga al inicio
+        preloadImages();
+    }, [])
 
     useEffect(() => {
         const handleScroll = () => {
