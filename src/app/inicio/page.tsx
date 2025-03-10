@@ -165,6 +165,20 @@ export default function Template() {
 
     const [outroVisible, setOutroVisible] = useState(false);
 
+    const imageCache = {};
+
+    function preloadImages() {
+        for (let i = 1; i <= 140; i++) {
+            const idStr = i.toString().padStart(3, "0");
+            const img = new Image();
+            img.src = `/asteroidesFrames/ezgif-frame-${idStr}.jpg`;
+            imageCache[idStr] = img;
+        }
+    }
+
+    // Llamar a la función de precarga al inicio
+    preloadImages();
+
     useEffect(() => {
         const handleScroll = () => {
             const contenedor = document.getElementById("contenedorSecundario") as HTMLDivElement;
@@ -214,7 +228,7 @@ export default function Template() {
                 const frame = Math.min(140, Math.max(1, Math.floor(progreso * 139) + 1));
 
                 const idStr = frame.toString().padStart(3, "0");
-                imagen.src = `/asteroidesFrames/ezgif-frame-${idStr}.jpg`;
+                imagen.src = imageCache[idStr]?.src || `/asteroidesFrames/ezgif-frame-${idStr}.jpg`;
 
                 // Calcular la opacidad de la imagen basada en el frame
                 // Comenzamos el desvanecimiento en el frame 70 y terminamos en el frame 120
