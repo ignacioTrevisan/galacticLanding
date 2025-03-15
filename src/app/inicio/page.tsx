@@ -46,7 +46,7 @@ export default function Template() {
     const [isMobile, setIsMobile] = useState(false);
     const [showScrollMessage, setShowScrollMessage] = useState(false);
     const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
-    const [isMessageShowed, setisMessageShowed] = useState(false)
+    const [isMessageShowed, setisMessageShowed] = useState(false);
     // Manejo del mensaje de scroll
     useEffect(() => {
         const handleScroll = () => {
@@ -59,7 +59,7 @@ export default function Template() {
                 if (isMessageShowed === true) return;
                 setisMessageShowed(true)
                 setShowScrollMessage(true);
-            }, 15000); // 2 segundos
+            }, 15000); // 15 segundos
         };
 
         window.addEventListener('scroll', handleScroll);
@@ -92,20 +92,85 @@ export default function Template() {
 
     useGSAP(() => {
         ScrollTrigger.getAll().forEach(st => st.kill());
+
+        const cards = gsap.utils.toArray<HTMLDivElement>(".card");
+
         if (isMobile) {
-            const cards = gsap.utils.toArray<HTMLDivElement>(".card");
-            cards.forEach((card) => {
+            // Efecto para móvil: secuencia de cards con parallax y fade
+            cards.forEach((card, index) => {
+                // Limpiar cualquier configuración previa
                 gsap.set(card, { clearProps: "all" });
+
                 const cardInner = card.querySelector(".card-inner");
                 if (cardInner) {
                     gsap.set(cardInner, { clearProps: "all" });
                 }
+
+                // Configurar animación para cada tarjeta
+                gsap.fromTo(card,
+                    { opacity: 0, y: 50 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scrollTrigger: {
+                            trigger: card,
+                            start: "top 80%",
+                            end: "bottom 20%",
+                            scrub: true,
+                            toggleActions: "play none none reverse"
+                        }
+                    }
+                );
+
+                // Efecto parallax para la imagen
+                const cardImg = card.querySelector(".card-img, .card-img-grande");
+                if (cardImg) {
+                    gsap.to(cardImg, {
+                        y: -30,
+                        scrollTrigger: {
+                            trigger: card,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: 1
+                        }
+                    });
+                }
+
+                // Efecto de texto
+                const cardContent = card.querySelector(".card-content");
+                if (cardContent) {
+                    gsap.fromTo(cardContent,
+                        { opacity: 0.6, y: 20 },
+                        {
+                            opacity: 1,
+                            y: 0,
+                            scrollTrigger: {
+                                trigger: card,
+                                start: "top 70%",
+                                end: "center center",
+                                scrub: 1
+                            }
+                        }
+                    );
+                }
             });
+
+            // Efecto de desplazamiento escalonado en mobile
+            gsap.to(".intro", {
+                opacity: 0,
+                y: -50,
+                scrollTrigger: {
+                    trigger: cards[0],
+                    start: "top 80%",
+                    end: "top 30%",
+                    scrub: true
+                }
+            });
+
             return;
         }
 
-        const cards = gsap.utils.toArray<HTMLDivElement>(".card");
-
+        // Efecto desktop original
         ScrollTrigger.create({
             trigger: cards[0],
             start: "top 35%",
@@ -175,12 +240,11 @@ export default function Template() {
             imageCache[idStr] = img;
         }
     }
+
     useEffect(() => {
-
-
         // Llamar a la función de precarga al inicio
         preloadImages();
-    }, [])
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -191,17 +255,7 @@ export default function Template() {
 
             if (!contenedor || !video || !imagen) return;
 
-            if (isMobile) {
-                const cardsElements = document.querySelectorAll('.card');
-                cardsElements.forEach(card => {
-                    (card as HTMLElement).style.transform = 'none';
-                    const inner = card.querySelector('.card-inner');
-                    if (inner) {
-                        (inner as HTMLElement).style.transform = 'none';
-                    }
-                });
-            }
-
+            // Calculamos la opacidad del video basado en el scroll
             const mitadDeScroll = contenedor.scrollHeight / 7;
             const posicionActualDeScroll = window.scrollY;
             const fraccionDeScroll = posicionActualDeScroll / mitadDeScroll;
@@ -213,11 +267,13 @@ export default function Template() {
             const cardsSection = document.querySelector('.cards') as HTMLElement;
             const cardsSectionBottom = cardsSection ? cardsSection.getBoundingClientRect().bottom : 0;
 
-            const factorMultiplicador = isMobile ? 1.5 : 5;
-            const factorOpacidad = isMobile ? 1 : 4;
+            // Ajustamos los factores para que la experiencia sea similar en móvil y escritorio
+            const factorMultiplicador = isMobile ? 0.8 : 5;
+            const factorOpacidad = isMobile ? 0.5 : 4;
 
+            // Puntos de activación ajustados para móvil
             const puntoInicioFrames = isMobile
-                ? posicionActualDeScroll + cardsSectionBottom - (window.innerHeight / 2)
+                ? posicionActualDeScroll + cardsSectionBottom - (window.innerHeight / 3)
                 : contenedor.scrollHeight - (window.innerHeight * factorMultiplicador);
 
             const puntoInicioOpacidad = isMobile
@@ -226,33 +282,26 @@ export default function Template() {
 
             if (posicionActualDeScroll > puntoInicioFrames) {
                 const distanciaRecorrida = posicionActualDeScroll - puntoInicioFrames;
-                const totalDistancia = isMobile ? window.innerHeight * 1.5 : window.innerHeight * factorMultiplicador;
+                // Ajuste del total de distancia para móvil para hacer la animación más compacta
+                const totalDistancia = isMobile ? window.innerHeight * 0.8 : window.innerHeight * factorMultiplicador;
                 const progreso = distanciaRecorrida / totalDistancia;
                 const frame = Math.min(140, Math.max(1, Math.floor(progreso * 139) + 1));
 
                 const idStr = frame.toString().padStart(3, "0");
                 imagen.src = imageCache[idStr]?.src || `/asteroidesFramesWebP/ezgif-frame-${idStr}.webp`;
 
-                // Calcular la opacidad de la imagen basada en el frame
-                // Comenzamos el desvanecimiento en el frame 70 y terminamos en el frame 120
-                const fadeStartFrame = 70;
-                const fadeEndFrame = 120;
+                // Ajuste de los frames para el desvanecimiento en móvil
+                const fadeStartFrame = isMobile ? 60 : 70;
+                const fadeEndFrame = isMobile ? 110 : 120;
 
                 if (frame >= fadeStartFrame) {
-                    // Calcular la opacidad basada en el progreso de frame
                     const fadeProgress = (frame - fadeStartFrame) / (fadeEndFrame - fadeStartFrame);
-                    // Limitar el progreso entre 0 y 1
                     const clampedProgress = Math.min(1, Math.max(0, fadeProgress));
-                    // Calcular la opacidad (de 1 a 0)
                     const imageOpacity = 1 - clampedProgress;
 
-                    // Aplicar la opacidad a la imagen
                     imagen.style.opacity = imageOpacity.toString();
-
-                    // Asegurarse de que el texto siempre está visible
                     continuara.style.opacity = '1';
                 } else {
-                    // Antes del inicio del desvanecimiento, tanto la imagen como el texto están completamente visibles
                     imagen.style.opacity = '1';
                     continuara.style.opacity = '1';
                 }
@@ -263,7 +312,6 @@ export default function Template() {
                 setOutroVisible(false);
             } else {
                 setOutroVisible(true);
-                // No establecer la opacidad aquí ya que se maneja en la lógica anterior
             }
         };
 
@@ -271,36 +319,6 @@ export default function Template() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, [isMobile]);
 
-    // const clients = [
-    //     {
-    //         id: 1,
-    //         name: "ViaCertatur",
-    //         image: "/clients/1.jpg",
-    //         description: "Lading page personalizable para negocio organizador de viajes",
-    //         url: 'https://www.viacertatur.com/'
-    //     },
-    //     {
-    //         id: 2,
-    //         name: "Teslo Shop",
-    //         image: "/clients/2.png",
-    //         description: "E-comerce con funcionalidades completas integrado con paypal.",
-    //         url: 'https://tesloshoptrev.vercel.app/'
-    //     },
-    //     {
-    //         id: 3,
-    //         name: "Cine Click",
-    //         image: "/clients/3.png",
-    //         description: "Gestor de cartelera con compras en landing incluida",
-    //         url: 'https://cine-click-zeta.vercel.app/'
-    //     },
-    //     {
-    //         id: 4,
-    //         name: "Share your spot",
-    //         image: "/clients/4.png",
-    //         description: "Localizador en tiempo real y reproductor de ubicacion",
-    //         url: '#'
-    //     }
-    // ];
     const Lenis = ReactLenis as unknown as React.FC<{ root?: boolean; children: React.ReactNode }>;
 
     return (
@@ -346,17 +364,6 @@ export default function Template() {
                             id="clientsContainer"
                         >
                             <h1 className="text-4xl sm:text-6xl text-white text-center transition-all duration-4000" id='titulo'>Continuara...</h1>
-                            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                                {clients.map((client) => (
-                                    <ClientCard
-                                        key={client.id}
-                                        client={client}
-                                        url={client.url}
-                                        containerId="clientsContainer"
-                                        className="animate__animated animate__fadeIn animate__slower"
-                                    />
-                                ))}
-                            </div> */}
                         </div>
                         <img
                             src="/asteroidesFrames/ezgif-frame-001.webp"

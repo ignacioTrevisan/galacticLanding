@@ -54,6 +54,16 @@ export const Navbar = () => {
 
         return () => clearTimeout(timer);
     }, []);
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            const timer = setTimeout(() => {
+                setIsMobileMenuOpen(false);
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [isMobileMenuOpen])
+
 
     const handleScrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
         e.preventDefault();
@@ -67,7 +77,7 @@ export const Navbar = () => {
     };
 
     return (
-        <nav className="fixed top-0 left-0 w-full z-50 px-5 py-4 text-white backdrop-blur-md">
+        <nav className="absolute top-0 left-0 w-full z-50 px-5 py-4 text-white backdrop-blur-md">
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo */}
                 <div className="flex flex-col animacionPorDefecto">
