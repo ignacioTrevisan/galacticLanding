@@ -97,7 +97,7 @@ export default function Template() {
 
         if (isMobile) {
             // Efecto para móvil: secuencia de cards con parallax y fade
-            cards.forEach((card, index) => {
+            cards.forEach((card) => {
                 // Limpiar cualquier configuración previa
                 gsap.set(card, { clearProps: "all" });
 
