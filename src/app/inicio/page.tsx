@@ -123,7 +123,6 @@ export default function Template() {
         });
 
         cards.forEach((card, index) => {
-          const isLastCard = index === cards.length - 1;
           const cardInner = card.querySelector(".card-inner");
 
           // Pin cada tarjeta cuando llega a la posición (todas iguales, incluyendo la última)
@@ -202,7 +201,6 @@ export default function Template() {
       });
 
       cards.forEach((card, index) => {
-        const isLastCard = index === cards.length - 1;
         const cardInner = card.querySelector(".card-inner");
 
         // Todas las cartas, incluyendo la última, se tratan igual
