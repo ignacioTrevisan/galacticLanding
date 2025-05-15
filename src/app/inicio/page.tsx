@@ -95,6 +95,19 @@ export default function Template() {
     () => {
       ScrollTrigger.getAll().forEach((st) => st.kill());
 
+      // Configuración global para mejorar el rendimiento
+      ScrollTrigger.config({
+        limitCallbacks: true, // Limita callbacks para mejor rendimiento
+      });
+
+      // Configurar refresh más suave
+      ScrollTrigger.addEventListener("refresh", () => {
+        ScrollTrigger.getAll().forEach((st) => st.update());
+      });
+
+      // Refresh ScrollTrigger para evitar conflictos
+      ScrollTrigger.refresh();
+
       const cards = gsap.utils.toArray<HTMLDivElement>(".card");
 
       if (isMobile) {
@@ -106,49 +119,38 @@ export default function Template() {
           end: "top 30%",
           pin: ".intro",
           pinSpacing: false,
+          anticipatePin: 1, // Ayuda a prevenir saltos
         });
 
         cards.forEach((card, index) => {
           const isLastCard = index === cards.length - 1;
           const cardInner = card.querySelector(".card-inner");
 
-          // Pin cada tarjeta cuando llega a la posición (incluyendo la última)
+          // Pin cada tarjeta cuando llega a la posición (todas iguales, incluyendo la última)
           ScrollTrigger.create({
             trigger: card,
             start: "top 35%",
             endTrigger: ".outro",
-            end: "top 65%",
+            end: "top 65%", // Todas las cartas terminan igual
             pin: true,
             pinSpacing: false,
+            anticipatePin: 1,
+            fastScrollEnd: true, // Mejora para scroll rápido
           });
 
-          // Animación de apilamiento para móvil con lógica especial para la última carta
-          if (!isLastCard) {
-            gsap.to(cardInner, {
-              y: `-${(cards.length - index) * 10}vh`,
-              ease: "none",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 35%",
-                endTrigger: ".outro",
-                end: "top 65%",
-                scrub: true,
-              },
-            });
-          } else {
-            // Para la última tarjeta, aplicamos una animación más suave que la mantiene en su lugar
-            gsap.to(cardInner, {
-              y: 0, // No se mueve verticalmente
-              ease: "none",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 35%",
-                endTrigger: ".outro",
-                end: "top 65%",
-                scrub: true,
-              },
-            });
-          }
+          // Animación de apilamiento para móvil (todas iguales)
+          gsap.to(cardInner, {
+            y: `-${(cards.length - index) * 10}vh`,
+            ease: "none",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 35%",
+              endTrigger: ".outro",
+              end: "top 65%", // Todas terminan en el mismo punto
+              scrub: 0.5, // Añadir un pequeño lag para suavizar
+              invalidateOnRefresh: true,
+            },
+          });
 
           // Efecto parallax suave para la imagen
           const cardImg = card.querySelector(".card-img, .card-img-grande");
@@ -160,6 +162,7 @@ export default function Template() {
                 start: "top bottom",
                 end: "bottom top",
                 scrub: 1,
+                invalidateOnRefresh: true, // Recalcula en resize
               },
             });
           }
@@ -178,6 +181,7 @@ export default function Template() {
                   start: "top 60%",
                   end: "top 40%",
                   scrub: 1,
+                  invalidateOnRefresh: true, // Recalcula en resize
                 },
               }
             );
@@ -201,16 +205,15 @@ export default function Template() {
         const isLastCard = index === cards.length - 1;
         const cardInner = card.querySelector(".card-inner");
 
-        if (!isLastCard) {
-          ScrollTrigger.create({
-            trigger: card,
-            start: "top 35%",
-            endTrigger: ".outro",
-            end: "top 65%",
-            pin: true,
-            pinSpacing: false,
-          });
-        }
+        // Todas las cartas, incluyendo la última, se tratan igual
+        ScrollTrigger.create({
+          trigger: card,
+          start: "top 35%",
+          endTrigger: ".outro",
+          end: "top 65%",
+          pin: true,
+          pinSpacing: false,
+        });
 
         gsap.to(cardInner, {
           y: `-${(cards.length - index) * 14}vh`,
@@ -266,87 +269,114 @@ export default function Template() {
   }, []);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const contenedor = document.getElementById(
-        "contenedorSecundario"
-      ) as HTMLDivElement;
-      const video = document.getElementById("video") as HTMLVideoElement;
-      const imagen = document.getElementById("imagenOutro") as HTMLImageElement;
-      const continuara = document.getElementById("titulo") as HTMLTitleElement;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const contenedor = document.getElementById(
+            "contenedorSecundario"
+          ) as HTMLDivElement;
+          const video = document.getElementById("video") as HTMLVideoElement;
+          const imagen = document.getElementById(
+            "imagenOutro"
+          ) as HTMLImageElement;
+          const continuara = document.getElementById(
+            "titulo"
+          ) as HTMLTitleElement;
 
-      if (!contenedor || !video || !imagen) return;
+          if (!contenedor || !video || !imagen) {
+            ticking = false;
+            return;
+          }
 
-      // Calculamos la opacidad del video basado en el scroll
-      const mitadDeScroll = contenedor.scrollHeight / 7;
-      const posicionActualDeScroll = window.scrollY;
-      const fraccionDeScroll = posicionActualDeScroll / mitadDeScroll;
-      const valor = fraccionDeScroll > 1 ? 1 : fraccionDeScroll;
-      const opacidad = (1 - valor) * 100;
+          // Calculamos la opacidad del video basado en el scroll
+          const mitadDeScroll = contenedor.scrollHeight / 7;
+          const posicionActualDeScroll = window.scrollY;
+          const fraccionDeScroll = posicionActualDeScroll / mitadDeScroll;
+          const valor = fraccionDeScroll > 1 ? 1 : fraccionDeScroll;
+          const opacidad = (1 - valor) * 100;
 
-      video.style.opacity = `${Math.floor(opacidad)}%`;
+          video.style.opacity = `${Math.floor(opacidad)}%`;
 
-      const cardsSection = document.querySelector(".cards") as HTMLElement;
-      const cardsSectionBottom = cardsSection
-        ? cardsSection.getBoundingClientRect().bottom
-        : 0;
+          const cardsSection = document.querySelector(".cards") as HTMLElement;
+          const cardsSectionBottom = cardsSection
+            ? cardsSection.getBoundingClientRect().bottom
+            : 0;
 
-      // Ajustes mejorados para móvil y desktop
-      const factorMultiplicador = isMobile ? 1.2 : 5;
-      const factorOpacidad = isMobile ? 0.8 : 4;
+          // Ajustes mejorados para móvil y desktop
+          const factorMultiplicador = isMobile ? 1.2 : 5;
+          const factorOpacidad = isMobile ? 0.8 : 4;
 
-      // Puntos de activación mejorados para móvil
-      const puntoInicioFrames = isMobile
-        ? posicionActualDeScroll + cardsSectionBottom - window.innerHeight / 2
-        : contenedor.scrollHeight - window.innerHeight * factorMultiplicador;
+          // Puntos de activación mejorados para móvil
+          const puntoInicioFrames = isMobile
+            ? posicionActualDeScroll +
+              cardsSectionBottom -
+              window.innerHeight / 2
+            : contenedor.scrollHeight -
+              window.innerHeight * factorMultiplicador;
 
-      const puntoInicioOpacidad = isMobile
-        ? posicionActualDeScroll + cardsSectionBottom - window.innerHeight * 0.8
-        : contenedor.scrollHeight - window.innerHeight * factorOpacidad;
+          const puntoInicioOpacidad = isMobile
+            ? posicionActualDeScroll +
+              cardsSectionBottom -
+              window.innerHeight * 0.8
+            : contenedor.scrollHeight - window.innerHeight * factorOpacidad;
 
-      if (posicionActualDeScroll > puntoInicioFrames) {
-        const distanciaRecorrida = posicionActualDeScroll - puntoInicioFrames;
-        // Ajuste mejorado del total de distancia para móvil
-        const totalDistancia = isMobile
-          ? window.innerHeight * 1.5
-          : window.innerHeight * factorMultiplicador;
-        const progreso = distanciaRecorrida / totalDistancia;
-        const frame = Math.min(
-          140,
-          Math.max(1, Math.floor(progreso * 139) + 1)
-        );
+          if (posicionActualDeScroll > puntoInicioFrames) {
+            const distanciaRecorrida =
+              posicionActualDeScroll - puntoInicioFrames;
+            // Ajuste mejorado del total de distancia para móvil
+            const totalDistancia = isMobile
+              ? window.innerHeight * 1.5
+              : window.innerHeight * factorMultiplicador;
+            const progreso = distanciaRecorrida / totalDistancia;
 
-        const idStr = frame.toString().padStart(3, "0");
-        imagen.src =
-          imageCache[idStr]?.src ||
-          `/asteroidesFramesWebP/ezgif-frame-${idStr}.webp`;
+            // Suavizar el progreso para evitar saltos bruscos
+            const smoothProgress = Math.min(1, Math.max(0, progreso));
+            const frame = Math.min(
+              140,
+              Math.max(1, Math.floor(smoothProgress * 139) + 1)
+            );
 
-        // Ajuste mejorado de los frames para el desvanecimiento
-        const fadeStartFrame = isMobile ? 70 : 70;
-        const fadeEndFrame = isMobile ? 120 : 120;
+            const idStr = frame.toString().padStart(3, "0");
 
-        if (frame >= fadeStartFrame) {
-          const fadeProgress =
-            (frame - fadeStartFrame) / (fadeEndFrame - fadeStartFrame);
-          const clampedProgress = Math.min(1, Math.max(0, fadeProgress));
-          const imageOpacity = 1 - clampedProgress;
+            // Asignar la imagen directamente, con fallback
+            imagen.src =
+              imageCache[idStr]?.src ||
+              `/asteroidesFramesWebP/ezgif-frame-${idStr}.webp`;
 
-          imagen.style.opacity = imageOpacity.toString();
-          continuara.style.opacity = "1";
-        } else {
-          imagen.style.opacity = "1";
-          continuara.style.opacity = "1";
-        }
-      }
+            // Ajuste mejorado de los frames para el desvanecimiento
+            const fadeStartFrame = isMobile ? 70 : 70;
+            const fadeEndFrame = isMobile ? 120 : 120;
 
-      if (posicionActualDeScroll <= puntoInicioOpacidad) {
-        imagen.style.opacity = "0";
-        setOutroVisible(false);
-      } else {
-        setOutroVisible(true);
+            if (frame >= fadeStartFrame) {
+              const fadeProgress =
+                (frame - fadeStartFrame) / (fadeEndFrame - fadeStartFrame);
+              const clampedProgress = Math.min(1, Math.max(0, fadeProgress));
+              const imageOpacity = 1 - clampedProgress;
+
+              imagen.style.opacity = imageOpacity.toString();
+              continuara.style.opacity = "1";
+            } else {
+              imagen.style.opacity = "1";
+              continuara.style.opacity = "1";
+            }
+          }
+
+          if (posicionActualDeScroll <= puntoInicioOpacidad) {
+            imagen.style.opacity = "0";
+            setOutroVisible(false);
+          } else {
+            setOutroVisible(true);
+          }
+
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isMobile]);
 
