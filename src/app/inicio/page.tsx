@@ -8,6 +8,7 @@ import "./inicio.css";
 import "../components/outro.css";
 import "animate.css";
 import { ReactLenis } from "@studio-freight/react-lenis";
+import { ContactSection } from "../components/contactSection";
 // import ClientCard from "@/components/clientCard";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -47,6 +48,7 @@ export default function Template() {
   const [showScrollMessage, setShowScrollMessage] = useState(false);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
   const [isMessageShowed, setisMessageShowed] = useState(false);
+  const [showContact, setShowContact] = useState(true); // Siempre montado para GSAP
 
   // Manejo del mensaje de scroll
   useEffect(() => {
@@ -249,6 +251,7 @@ export default function Template() {
   ];
 
   const [outroVisible, setOutroVisible] = useState(false);
+  const [lastFrame, setLastFrame] = useState(1);
 
   const imageCache: { [key: string]: HTMLImageElement } = {};
 
@@ -262,7 +265,6 @@ export default function Template() {
   }
 
   useEffect(() => {
-    // Llamar a la función de precarga al inicio
     preloadImages();
   }, []);
 
@@ -283,7 +285,7 @@ export default function Template() {
             "titulo"
           ) as HTMLTitleElement;
 
-          if (!contenedor || !video || !imagen) {
+          if (!contenedor || !video || !imagen || !continuara) {
             ticking = false;
             return;
           }
@@ -302,70 +304,71 @@ export default function Template() {
             ? cardsSection.getBoundingClientRect().bottom
             : 0;
 
-          // Ajustes mejorados para móvil y desktop
-          const factorMultiplicador = isMobile ? 1.2 : 5;
-          const factorOpacidad = isMobile ? 0.8 : 4;
-
-          // Puntos de activación mejorados para móvil
+          // Las imágenes empiezan justo después de las cards
           const puntoInicioFrames = isMobile
-            ? posicionActualDeScroll +
-              cardsSectionBottom -
-              window.innerHeight / 2
-            : contenedor.scrollHeight -
-              window.innerHeight * factorMultiplicador;
+            ? posicionActualDeScroll + cardsSectionBottom
+            : posicionActualDeScroll + cardsSectionBottom;
 
-          const puntoInicioOpacidad = isMobile
-            ? posicionActualDeScroll +
-              cardsSectionBottom -
-              window.innerHeight * 0.8
-            : contenedor.scrollHeight - window.innerHeight * factorOpacidad;
+          const puntoInicioOpacidad = puntoInicioFrames - window.innerHeight;
 
           if (posicionActualDeScroll > puntoInicioFrames) {
+            setOutroVisible(true); // Activar outro cuando empiezan los frames
+
             const distanciaRecorrida =
               posicionActualDeScroll - puntoInicioFrames;
-            // Ajuste mejorado del total de distancia para móvil
-            const totalDistancia = isMobile
-              ? window.innerHeight * 1.5
-              : window.innerHeight * factorMultiplicador;
+            const totalDistancia = window.innerHeight * 3; // 3 pantallas para completar la animación
+
             const progreso = distanciaRecorrida / totalDistancia;
 
-            // Suavizar el progreso para evitar saltos bruscos
             const smoothProgress = Math.min(1, Math.max(0, progreso));
             const frame = Math.min(
               140,
               Math.max(1, Math.floor(smoothProgress * 139) + 1)
             );
 
+            // Actualizar el frame (ahora permite retroceso)
+            setLastFrame(frame);
+
             const idStr = frame.toString().padStart(3, "0");
 
-            // Asignar la imagen directamente, con fallback
             imagen.src =
               imageCache[idStr]?.src ||
               `/asteroidesFramesWebP/ezgif-frame-${idStr}.webp`;
 
-            // Ajuste mejorado de los frames para el desvanecimiento
-            const fadeStartFrame = isMobile ? 70 : 70;
-            const fadeEndFrame = isMobile ? 120 : 120;
-
-            if (frame >= fadeStartFrame) {
-              const fadeProgress =
-                (frame - fadeStartFrame) / (fadeEndFrame - fadeStartFrame);
-              const clampedProgress = Math.min(1, Math.max(0, fadeProgress));
-              const imageOpacity = 1 - clampedProgress;
-
-              imagen.style.opacity = imageOpacity.toString();
-              continuara.style.opacity = "1";
-            } else {
-              imagen.style.opacity = "1";
+            // "Continuara..." aparece gradualmente desde el frame 1 al 30
+            if (frame <= 30) {
+              const fadeInProgress = frame / 20; // 0 a 1
+              continuara.style.opacity = fadeInProgress.toString();
+            }
+            // "Continuara..." se mantiene visible del frame 30 al 50
+            else if (frame > 20 && frame <= 35) {
               continuara.style.opacity = "1";
             }
+            // "Continuara..." se desvanece del frame 50 al 80
+            // mientras ContactSection ya está apareciendo desde abajo (controlado por GSAP)
+            else if (frame > 35 && frame <= 50) {
+              const fadeOutProgress = (frame * 2 - 50) / 30; // 0 a 1
+              continuara.style.opacity = (1 - fadeOutProgress).toString();
+            }
+            // Después del frame 80, completamente invisible
+            else if (frame > 80) {
+              continuara.style.opacity = "0";
+            }
+          } else {
+            // Mantener el último frame
+            const idStr = lastFrame.toString().padStart(3, "0");
+            imagen.src =
+              imageCache[idStr]?.src ||
+              `/asteroidesFramesWebP/ezgif-frame-${idStr}.webp`;
           }
 
-          if (posicionActualDeScroll <= puntoInicioOpacidad) {
-            imagen.style.opacity = "0";
-            setOutroVisible(false);
-          } else {
+          // Controlar visibilidad del outro
+          if (posicionActualDeScroll > puntoInicioOpacidad) {
             setOutroVisible(true);
+            imagen.style.opacity = "1";
+          } else {
+            setOutroVisible(false);
+            imagen.style.opacity = "0";
           }
 
           ticking = false;
@@ -376,7 +379,7 @@ export default function Template() {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isMobile]);
+  }, [isMobile, lastFrame]);
 
   const Lenis = ReactLenis as unknown as React.FC<{
     root?: boolean;
@@ -423,21 +426,20 @@ export default function Template() {
             pointerEvents: outroVisible ? "auto" : "none",
           }}
         >
-          <div id="outroContainer" className="relative">
+          <div id="outroContainer" className="relative min-h-screen">
             <div
               className="z-10 sticky top-10 text-white transition-opacity duration-5000 mb-6 md:mb-12"
               style={{ opacity: outroVisible ? 1 : 0 }}
-            >
-              {/* <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">Nuestros clientes</h1> */}
-            </div>
+            ></div>
             <div
-              className={`client-cards-container sticky top-40 z-20 transition-opacity duration-5000 w-full mx-auto`}
-              style={{ opacity: outroVisible ? 1 : 0 }}
+              className={`client-cards-container sticky top-40 w-full mx-auto`}
               id="clientsContainer"
+              style={{ zIndex: 50 }}
             >
               <h1
-                className="text-4xl sm:text-6xl text-white text-center transition-all duration-4000"
+                className="text-4xl sm:text-6xl text-white text-center"
                 id="titulo"
+                style={{ opacity: 0, transition: "opacity 0.3s ease" }}
               >
                 Continuara...
               </h1>
@@ -445,14 +447,17 @@ export default function Template() {
             <img
               src="/asteroidesFrames/ezgif-frame-001.webp"
               alt=""
-              className={`top-0 w-full h-full object-cover ${
+              className={`top-0 w-full min-w-full h-full object-cover ${
                 !outroVisible ? "hidden" : "fixed"
               }`}
               id="imagenOutro"
-              style={{ transition: "opacity 0.3s ease" }}
+              style={{ transition: "opacity 0.3s ease", zIndex: 25 }}
             />
           </div>
         </section>
+
+        {/* ContactSection sin wrapper - se maneja con su propio CSS */}
+        <ContactSection isVisible={showContact} />
 
         {/* Mensaje de scroll */}
         {showScrollMessage && (
