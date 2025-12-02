@@ -48,7 +48,7 @@ export default function Template() {
   const [showScrollMessage, setShowScrollMessage] = useState(false);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
   const [isMessageShowed, setisMessageShowed] = useState(false);
-  const [showContact, setShowContact] = useState(true); // Siempre montado para GSAP
+  const [showContact] = useState(true); // Siempre montado para GSAP
 
   // Manejo del mensaje de scroll
   useEffect(() => {
@@ -419,14 +419,14 @@ export default function Template() {
         </section>
 
         <section
-          className={`outro text-[#6A0DAD] px-4 transition-all w-full pointer-events-none`}
+          className={`outro text-[#6A0DAD] h-full min-h-max px-4 transition-all w-full pointer-events-none`}
           id="clientes"
           style={{
             opacity: outroVisible ? 1 : 0,
             pointerEvents: outroVisible ? "auto" : "none",
           }}
         >
-          <div id="outroContainer" className="relative min-h-screen">
+          <div id="outroContainer" className="relative h-full min-h-max">
             <div
               className="z-10 sticky top-10 text-white transition-opacity duration-5000 mb-6 md:mb-12"
               style={{ opacity: outroVisible ? 1 : 0 }}
@@ -454,10 +454,12 @@ export default function Template() {
               style={{ transition: "opacity 0.3s ease", zIndex: 25 }}
             />
           </div>
+          <div className="absolute  w-full">
+            <ContactSection isVisible={showContact} />
+          </div>
         </section>
 
         {/* ContactSection sin wrapper - se maneja con su propio CSS */}
-        <ContactSection isVisible={showContact} />
 
         {/* Mensaje de scroll */}
         {showScrollMessage && (
