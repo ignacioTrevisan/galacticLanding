@@ -119,7 +119,7 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
 
   return (
     <section
-      className="contact-section relative"
+      className="contact-section relative z-[1000]"
       id="contacto"
       ref={contactRef}
       style={{

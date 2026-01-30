@@ -184,7 +184,7 @@ export default function Template() {
                   scrub: 1,
                   invalidateOnRefresh: true, // Recalcula en resize
                 },
-              }
+              },
             );
           }
         });
@@ -228,7 +228,7 @@ export default function Template() {
         });
       });
     },
-    { scope: container, dependencies: [isMobile] }
+    { scope: container, dependencies: [isMobile] },
   );
 
   const cards = [
@@ -275,14 +275,14 @@ export default function Template() {
       if (!ticking) {
         requestAnimationFrame(() => {
           const contenedor = document.getElementById(
-            "contenedorSecundario"
+            "contenedorSecundario",
           ) as HTMLDivElement;
           const video = document.getElementById("video") as HTMLVideoElement;
           const imagen = document.getElementById(
-            "imagenOutro"
+            "imagenOutro",
           ) as HTMLImageElement;
           const continuara = document.getElementById(
-            "titulo"
+            "titulo",
           ) as HTMLTitleElement;
 
           if (!contenedor || !video || !imagen || !continuara) {
@@ -323,7 +323,7 @@ export default function Template() {
             const smoothProgress = Math.min(1, Math.max(0, progreso));
             const frame = Math.min(
               140,
-              Math.max(1, Math.floor(smoothProgress * 139) + 1)
+              Math.max(1, Math.floor(smoothProgress * 139) + 1),
             );
 
             // Actualizar el frame (ahora permite retroceso)
@@ -391,14 +391,14 @@ export default function Template() {
       <Navbar />
 
       <div
-        className="bodyContainer animate__animated animate__fadeIn"
+        className="bodyContainer animate__animated animate__fadeIn "
         ref={container}
         id="contenedorSecundario"
       >
         <section className="hero">
           <video
             src="https://res.cloudinary.com/nachotrevisan/video/upload/v1741385181/Video2_qwjjty.mp4"
-            className="fixed z-30 top-0 w-full h-full object-cover"
+            className="fixed z-30 top-0 w-full h-full object-cover "
             id="video"
             autoPlay
             loop
@@ -426,7 +426,7 @@ export default function Template() {
             pointerEvents: outroVisible ? "auto" : "none",
           }}
         >
-          <div id="outroContainer" className="relative h-full min-h-max">
+          <div id="outroContainer" className="relative h-full min-h-max ">
             <div
               className="z-10 sticky top-10 text-white transition-opacity duration-5000 mb-6 md:mb-12"
               style={{ opacity: outroVisible ? 1 : 0 }}
