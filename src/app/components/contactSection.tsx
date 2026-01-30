@@ -1,6 +1,13 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Send,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/all";
 import "./contactSection.css";
@@ -18,22 +25,25 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
     mensaje: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
+
   const contactRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!contactRef.current || !contentRef.current) return;
 
-    // Detectar si es móvil
     const isMobile = window.innerWidth < 768;
 
-    // En móvil, hacer visible inmediatamente sin animaciones complejas
     if (isMobile) {
       gsap.set(contentRef.current, { opacity: 1 });
       return;
     }
 
-    // Solo en desktop: animaciones GSAP
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: contactRef.current,
@@ -44,17 +54,8 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
     });
 
     tl.fromTo(contentRef.current, { opacity: 0 }, { opacity: 1, ease: "none" });
-
-    tl.to(contentRef.current, {
-      opacity: 1,
-      duration: 1.5,
-      ease: "none",
-    });
-
-    tl.to(contentRef.current, {
-      opacity: 0,
-      ease: "none",
-    });
+    tl.to(contentRef.current, { opacity: 1, duration: 1.5, ease: "none" });
+    tl.to(contentRef.current, { opacity: 0, ease: "none" });
 
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => {
@@ -65,10 +66,46 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Formulario enviado:", formData);
-    setFormData({ nombre: "", email: "", mensaje: "" });
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: "" });
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus({
+          type: "success",
+          message: "¡Mensaje enviado exitosamente! Te contactaremos pronto.",
+        });
+        setFormData({ nombre: "", email: "", mensaje: "" });
+      } else {
+        throw new Error(data.error || "Error al enviar el mensaje");
+      }
+    } catch (error) {
+      setSubmitStatus({
+        type: "error",
+        message:
+          "Hubo un error al enviar el mensaje. Por favor, intenta nuevamente.",
+      });
+      console.error("Error:", error);
+    } finally {
+      setIsSubmitting(false);
+
+      // Limpiar mensaje después de 5 segundos
+      setTimeout(() => {
+        setSubmitStatus({ type: null, message: "" });
+      }, 5000);
+    }
   };
 
   const handleChange = (
@@ -105,7 +142,6 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
         </div>
 
         <div className="contact-content">
-          {/* Información de contacto */}
           <div className="contact-info">
             <div className="info-card">
               <div className="icon-wrapper">
@@ -152,9 +188,21 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
             </div>
           </div>
 
-          {/* Formulario de contacto */}
           <div className="contact-form-wrapper">
             <form onSubmit={handleSubmit} className="contact-form">
+              {submitStatus.type && (
+                <div
+                  className={`alert ${submitStatus.type === "success" ? "alert-success" : "alert-error"}`}
+                >
+                  {submitStatus.type === "success" ? (
+                    <CheckCircle className="w-5 h-5" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5" />
+                  )}
+                  <span>{submitStatus.message}</span>
+                </div>
+              )}
+
               <div className="form-group">
                 <label htmlFor="nombre" className="form-label">
                   Nombre
@@ -166,6 +214,7 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
                   value={formData.nombre}
                   onChange={handleChange}
                   required
+                  disabled={isSubmitting}
                   className="form-input"
                   placeholder="Tu nombre"
                 />
@@ -182,6 +231,7 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  disabled={isSubmitting}
                   className="form-input"
                   placeholder="tu@email.com"
                 />
@@ -197,14 +247,19 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
                   value={formData.mensaje}
                   onChange={handleChange}
                   required
+                  disabled={isSubmitting}
                   rows={5}
                   className="form-input form-textarea"
                   placeholder="Cuéntanos sobre tu proyecto..."
                 />
               </div>
 
-              <button type="submit" className="submit-button">
-                <span>Enviar Mensaje</span>
+              <button
+                type="submit"
+                className="submit-button"
+                disabled={isSubmitting}
+              >
+                <span>{isSubmitting ? "Enviando..." : "Enviar Mensaje"}</span>
                 <Send className="w-5 h-5 ml-2" />
               </button>
             </form>
