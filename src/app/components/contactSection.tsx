@@ -24,7 +24,16 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
   useEffect(() => {
     if (!contactRef.current || !contentRef.current) return;
 
-    // Timeline para secuencia de animaciones con pinning
+    // Detectar si es móvil
+    const isMobile = window.innerWidth < 768;
+
+    // En móvil, hacer visible inmediatamente sin animaciones complejas
+    if (isMobile) {
+      gsap.set(contentRef.current, { opacity: 1 });
+      return;
+    }
+
+    // Solo en desktop: animaciones GSAP
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: contactRef.current,
@@ -34,27 +43,14 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
       },
     });
 
-    //Fase 1: Aparece desde abajo
-    tl.fromTo(
-      contentRef.current,
-      {
-        opacity: 0,
-      },
-      {
-        opacity: 1,
-        ease: "none",
-      }
-    );
+    tl.fromTo(contentRef.current, { opacity: 0 }, { opacity: 1, ease: "none" });
 
-    // Fase 2: Se queda pineado en el centro (sin movimiento)
     tl.to(contentRef.current, {
       opacity: 1,
-
-      duration: 1.5, // Controla cuánto "scroll" permanece fijo (aumenta para más scroll)
+      duration: 1.5,
       ease: "none",
     });
 
-    // Fase 3: Sale hacia arriba y desaparece
     tl.to(contentRef.current, {
       opacity: 0,
       ease: "none",
@@ -76,7 +72,7 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setFormData({
       ...formData,
@@ -96,7 +92,7 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
       }}
     >
       <div
-        className="contact-container sticky top-[-100px] z-30"
+        className="contact-container md:sticky top-0 md:top-[-100px] z-30"
         ref={contentRef}
       >
         <div className="contact-header">
@@ -104,7 +100,7 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
             Contactános
           </h2>
           <p className="text-lg sm:text-xl md:text-2xl text-purple-200 mb-12">
-            Despega tu proyecto digital con nosotros
+            Despegá tu proyecto digital con nosotros
           </p>
         </div>
 
@@ -118,7 +114,7 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
               <div>
                 <h3 className="text-lg font-semibold text-white mb-1">Email</h3>
                 <a
-                  href="mailto:contacto@tuempresa.com"
+                  href="mailto:galacticcodeweb@gmail.com"
                   className="text-purple-300 hover:text-purple-100 transition-colors"
                 >
                   galacticcodeweb@gmail.com
@@ -135,7 +131,7 @@ export const ContactSection = ({ isVisible = true }: ContactSectionProps) => {
                   Teléfono
                 </h3>
                 <a
-                  href="tel:+5491234567890"
+                  href="tel:+5493455472377"
                   className="text-purple-300 hover:text-purple-100 transition-colors"
                 >
                   +54 9 3455 472377
