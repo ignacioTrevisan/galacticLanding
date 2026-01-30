@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         pass: process.env.SMTP_PASSWORD,
       },
       tls: {
-        rejectUnauthorized: false, // Útil para desarrollo
+        rejectUnauthorized: false,
       },
     });
 
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     const mailOptions = {
       from: `"${process.env.SMTP_FROM_NAME}" <${process.env.SMTP_FROM}>`,
       to: process.env.EMAIL_TO,
-      replyTo: email, // Para responder directamente al usuario
+      replyTo: email,
       subject: `Nuevo mensaje de contacto de ${nombre}`,
       html: `
         <!DOCTYPE html>
@@ -140,13 +140,16 @@ export async function POST(request: Request) {
       },
       { status: 200 },
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error("❌ Error completo al enviar email:", error);
+
+    const errorMessage =
+      error instanceof Error ? error.message : "Error desconocido";
 
     return NextResponse.json(
       {
         error: "Error al enviar el email",
-        details: error.message || "Error desconocido",
+        details: errorMessage,
       },
       { status: 500 },
     );
